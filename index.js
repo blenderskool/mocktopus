@@ -80,11 +80,11 @@ program
       let result;
       if (code) {
         result = await askGPT(
-          `Generate JS code with "@faker-js/faker" library to create mock data for the "${definition}" proto definition in object format. Use only UUID for id fields if needed\n\n${defStr}`
+          `Generate JS code with "@faker-js/faker" library to create mock data for the "${definition}" proto definition in object format. Use only UUID for id fields and working image urls if needed\n\n${defStr}`
         );
       } else {
         result = await askGPT(
-          `Generate ${count} unique array items with mock data in JSON format for the "${definition}" proto definition. Use only UUID for id fields if needed\n\n${defStr}`
+          `Generate valid JSON array with ${count} unique items and each item satisfying the "${definition}" proto definition. Use only UUID for id fields and working image urls if needed\n\n${defStr}`
         );
       }
 
