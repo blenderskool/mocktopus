@@ -7,64 +7,7 @@ import chalk from 'chalk';
 import path from 'path';
 import ora from 'ora';
 import fs from 'fs/promises';
-import { OpenAI } from 'node-openai';
-
-if (!process.env.MOCKTOPUS_OPENAI_KEY) {
-  console.log(
-    chalk.red(
-      'Please add your OpenAI API key as env variable named "MOCKTOPUS_OPENAI_KEY"'
-    )
-  );
-  process.exit(0);
-}
-
-const openai = new OpenAI({
-  apiKey: process.env.MOCKTOPUS_OPENAI_KEY,
-}).v1();
-
-// Extracts all nested "MessageDefinition" types from proto AST
-const extractMessageDefinitions = (def, result) => {
-  if (!def) return;
-
-  if (def?.syntaxType === 'MessageDefinition') {
-    result.push(def);
-  } else if (def.nested) {
-    Object.values(def.nested).forEach((child) =>
-      extractMessageDefinitions(child, result)
-    );
-  }
-};
-
-// Resolves dependencies and converts proto definition AST to string
-const getDefStr = (definitions, definition) => {
-  const def = definitions.find(({ name }) => name === definition);
-  const fields = Object.values(def.fields);
-
-  const defStr = [];
-  const fieldsStr = fields
-    .map((field) => {
-      // If the type is a user-defined type, include as a dependency
-      if (field.type.syntaxType === 'Identifier') {
-        defStr.push(getDefStr(definitions, field.type.value));
-      }
-
-      const baseStr = `${field.type.value} ${field.name}=${field.id};`;
-      if (field.repeated) {
-        return `repeated ${baseStr}`;
-      }
-
-      return baseStr;
-    })
-    .join('\n');
-
-  defStr.push(`message ${def.name} {\n${fieldsStr}\n}`);
-
-  return defStr.join('\n\n');
-};
-
-// Utility that resolves after a timeout
-const sleep = (duration) =>
-  new Promise((resolve) => setTimeout(resolve, duration));
+import { askGPT, extractMessageDefinitions, getDefStr, sleep } from './utils';
 
 program
   .name('mocktopus')
@@ -129,31 +72,18 @@ program
           : 'Generating mock data for proto definition 🪄',
       }).start();
 
-      let response;
+      let result;
       if (code) {
-        response = await openai.chat.create({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: `Generate JS code with "@faker-js/faker" library to create mock data for the "${definition}" proto definition in object format. Use only UUID for id fields if needed\n\n${defStr}`,
-            },
-          ],
-        });
+        result = await askGPT(
+          `Generate JS code with "@faker-js/faker" library to create mock data for the "${definition}" proto definition in object format. Use only UUID for id fields if needed\n\n${defStr}`
+        );
       } else {
-        response = await openai.chat.create({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: `Generate ${count} unique array items with mock data in JSON format for the "${definition}" proto definition. Use only UUID for id fields if needed\n\n${defStr}`,
-            },
-          ],
-        });
+        result = await askGPT(
+          `Generate ${count} unique array items with mock data in JSON format for the "${definition}" proto definition. Use only UUID for id fields if needed\n\n${defStr}`
+        );
       }
 
       spinner.stop();
-      const result = response.choices[0].message.content;
       await fs.writeFile(path.resolve(outputPath), result);
 
       console.log();
@@ -195,19 +125,12 @@ program
         text: 'Generating mock placeholder data 🪄',
       }).start();
 
-      const response = await openai.chat.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'user',
-            content: `Generate ${count} placeholder data for ${placeholder}`,
-          },
-        ],
-      });
+      const result = await askGPT(
+        `Generate ${count} placeholder data for ${placeholder}`
+      );
 
       spinner.stop();
 
-      const result = response.choices[0].message.content;
       console.log();
       console.log(chalk.green('✅ Mock data generated successfully 🐙'));
       console.log();
@@ -243,19 +166,12 @@ program
         text: 'Generating tests for code snippet 🪄',
       }).start();
 
-      const response = await openai.chat.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'user',
-            content: `Generate tests code for the following code snippet based on what it does in the same language\n\n${inputStr}`,
-          },
-        ],
-      });
+      const result = await askGPT(
+        `Generate tests code for the following code snippet based on what it does in the same language\n\n${inputStr}`
+      );
 
       spinner.stop();
 
-      const result = response.choices[0].message.content;
       await fs.writeFile(path.resolve(outputPath), result);
 
       console.log();
