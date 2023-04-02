@@ -61,7 +61,7 @@ export const sleep = (duration) =>
 
 // Sends a message to ChatGPT and returns a response
 export const askGPT = async (message) => {
-  const response = await openai.createChatCompletion({
+  const { data } = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages: [
       {
@@ -71,5 +71,5 @@ export const askGPT = async (message) => {
     ],
   });
 
-  return response.choices[0].message.content;
+  return data.choices[0].message.content;
 };
