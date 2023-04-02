@@ -25,7 +25,7 @@ program
 
 program
   .command('proto <source> <destination>')
-  .option('-c --code', 'generate code for generating mock data')
+  .option('-c, --code', 'generate code for generating mock data')
   .description(
     'generate mock data for complex structures by analyzing proto definitions'
   )
@@ -187,6 +187,41 @@ program
         chalk.red.bold(
           '⚠️ Unexpected error occurred, try with different code snippet'
         )
+      );
+      console.log(chalk.white.dim(err));
+    }
+  });
+
+program
+  .command('persona')
+  .description('generate user personas for a product')
+  .action(async () => {
+    try {
+      const { product } = await inquirer.prompt([
+        {
+          name: 'product',
+          message: 'Describe your product:',
+        },
+      ]);
+
+      const spinner = ora({
+        text: 'Generating user personas for the product 🪄',
+      }).start();
+
+      const result = await askGPT(
+        `Create a few user personas with name alliterations and different backgrounds for ${product}. Also add behavior, needs and wants, demographics to each persona`
+      );
+
+      spinner.stop();
+
+      console.log();
+      console.log(chalk.green('✅ User personas generated successfully 🐙'));
+      console.log();
+      console.log(result);
+    } catch (err) {
+      console.log();
+      console.log(
+        chalk.red.bold('⚠️ Unexpected error occurred, try again later')
       );
       console.log(chalk.white.dim(err));
     }
