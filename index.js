@@ -7,7 +7,12 @@ import chalk from 'chalk';
 import path from 'path';
 import ora from 'ora';
 import fs from 'fs/promises';
-import { askGPT, extractMessageDefinitions, getDefStr, sleep } from './utils';
+import {
+  askGPT,
+  extractMessageDefinitions,
+  getDefStr,
+  sleep,
+} from './utils.js';
 
 program
   .name('mocktopus')
