@@ -101,79 +101,76 @@ program
 
     console.log(chalk.green.bold(`${definitions.length} definitions found`));
 
-    inquirer
-      .prompt([
-        {
-          name: 'definition',
-          message: 'Which definition do you want mock data for?',
-          type: 'list',
-          choices: definitions.map(({ name, fields }) => ({
-            value: name,
-            name: `${name} (${Object.keys(fields).length} fields)`,
-          })),
-        },
-        {
-          name: 'count',
-          message: 'Number of records to generate?',
-          type: 'number',
-          default: 1,
-          when: () => !code,
-        },
-      ])
-      .then(async ({ definition, count }) => {
-        try {
-          const defStr = getDefStr(definitions, definition);
-          const spinner = ora({
-            text: code
-              ? 'Generating code for generating mock data for proto definition 🪄'
-              : 'Generating mock data for proto definition 🪄',
-          }).start();
+    const { definition, count } = await inquirer.prompt([
+      {
+        name: 'definition',
+        message: 'Which definition do you want mock data for?',
+        type: 'list',
+        choices: definitions.map(({ name, fields }) => ({
+          value: name,
+          name: `${name} (${Object.keys(fields).length} fields)`,
+        })),
+      },
+      // The following question is only relevant when code is not being generated
+      {
+        name: 'count',
+        message: 'Number of records to generate?',
+        type: 'number',
+        default: 1,
+        when: () => !code,
+      },
+    ]);
 
-          let response;
-          if (code) {
-            response = await openai.chat.create({
-              model: 'gpt-3.5-turbo',
-              messages: [
-                {
-                  role: 'user',
-                  content: `Generate JS code with "@faker-js/faker" library to create mock data for the "${definition}" proto definition in object format. Use only UUID for id fields if needed\n\n${defStr}`,
-                },
-              ],
-            });
-          } else {
-            response = await openai.chat.create({
-              model: 'gpt-3.5-turbo',
-              messages: [
-                {
-                  role: 'user',
-                  content: `Generate ${count} unique array items with mock data in JSON format for the "${definition}" proto definition. Use only UUID for id fields if needed\n\n${defStr}`,
-                },
-              ],
-            });
-          }
+    try {
+      const defStr = getDefStr(definitions, definition);
+      const spinner = ora({
+        text: code
+          ? 'Generating code for generating mock data for proto definition 🪄'
+          : 'Generating mock data for proto definition 🪄',
+      }).start();
 
-          spinner.stop();
-          const result = response.choices[0].message.content;
-          await fs.writeFile(path.resolve(outputPath), result);
+      let response;
+      if (code) {
+        response = await openai.chat.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'user',
+              content: `Generate JS code with "@faker-js/faker" library to create mock data for the "${definition}" proto definition in object format. Use only UUID for id fields if needed\n\n${defStr}`,
+            },
+          ],
+        });
+      } else {
+        response = await openai.chat.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'user',
+              content: `Generate ${count} unique array items with mock data in JSON format for the "${definition}" proto definition. Use only UUID for id fields if needed\n\n${defStr}`,
+            },
+          ],
+        });
+      }
 
-          console.log();
-          console.log(
-            chalk.green(
-              code
-                ? '✅ Code for mock data generated successfully 🐙'
-                : '✅ Mock data generated successfully 🐙'
-            )
-          );
-        } catch (err) {
-          console.log();
-          console.log(
-            chalk.red.bold(
-              '⚠️ Unexpected error occurred, try different definition'
-            )
-          );
-          console.log(chalk.white.dim(err));
-        }
-      });
+      spinner.stop();
+      const result = response.choices[0].message.content;
+      await fs.writeFile(path.resolve(outputPath), result);
+
+      console.log();
+      console.log(
+        chalk.green(
+          code
+            ? '✅ Code for mock data generated successfully 🐙'
+            : '✅ Mock data generated successfully 🐙'
+        )
+      );
+    } catch (err) {
+      console.log();
+      console.log(
+        chalk.red.bold('⚠️ Unexpected error occurred, try different definition')
+      );
+      console.log(chalk.white.dim(err));
+    }
   });
 
 program.parse();
