@@ -221,4 +221,54 @@ program
     }
   });
 
+program
+  .command('tests <source> <destination>')
+  .description('generate test cases for code snippets')
+  .action(async (source, outputPath) => {
+    try {
+      let inputPath = source;
+      let range = [0, Number.MAX_SAFE_INTEGER];
+      if (source.includes('#')) {
+        [inputPath, range] = inputPath.split('#');
+        range = range.split(':');
+      }
+
+      const inputFile = (await fs.readFile(path.resolve(inputPath))).toString();
+      const inputStr = inputFile
+        .split('\n')
+        .slice(range[0] - 1, range[1])
+        .join('\n');
+
+      const spinner = ora({
+        text: 'Generating tests for code snippet 🪄',
+      }).start();
+
+      const response = await openai.chat.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'user',
+            content: `Generate tests code for the following code snippet based on what it does in the same language\n\n${inputStr}`,
+          },
+        ],
+      });
+
+      spinner.stop();
+
+      const result = response.choices[0].message.content;
+      await fs.writeFile(path.resolve(outputPath), result);
+
+      console.log();
+      console.log(chalk.green('✅ Test cases generated successfully 🐙'));
+    } catch (err) {
+      console.log();
+      console.log(
+        chalk.red.bold(
+          '⚠️ Unexpected error occurred, try with different code snippet'
+        )
+      );
+      console.log(chalk.white.dim(err));
+    }
+  });
+
 program.parse();
