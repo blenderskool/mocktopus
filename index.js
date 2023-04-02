@@ -173,4 +173,52 @@ program
     }
   });
 
+program
+  .command('placeholder')
+  .description('generate mock data from natural descriptions')
+  .action(async () => {
+    const { placeholder, count } = await inquirer.prompt([
+      {
+        name: 'placeholder',
+        message: 'What do you want placeholder for?',
+      },
+      {
+        name: 'count',
+        message: 'Number of records to generate?',
+        type: 'number',
+        default: 1,
+      },
+    ]);
+
+    try {
+      const spinner = ora({
+        text: 'Generating mock placeholder data 🪄',
+      }).start();
+
+      const response = await openai.chat.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'user',
+            content: `Generate ${count} placeholder data for ${placeholder}`,
+          },
+        ],
+      });
+
+      spinner.stop();
+
+      const result = response.choices[0].message.content;
+      console.log();
+      console.log(chalk.green('✅ Mock data generated successfully 🐙'));
+      console.log();
+      console.log(result);
+    } catch (err) {
+      console.log();
+      console.log(
+        chalk.red.bold('⚠️ Unexpected error occurred, try again later')
+      );
+      console.log(chalk.white.dim(err));
+    }
+  });
+
 program.parse();
