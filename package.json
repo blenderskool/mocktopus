@@ -13,7 +13,7 @@
     "chalk": "^5.2.0",
     "commander": "^10.0.0",
     "inquirer": "^9.1.5",
-    "node-openai": "^0.5.2",
+    "openai": "^3.2.1",
     "ora": "^6.3.0",
     "proto-parser": "^0.0.9"
   }
