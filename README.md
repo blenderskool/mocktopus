@@ -11,17 +11,12 @@
 
 ### Installation
 
-This project requires:
+Note: This project requires your own OpenAI API key that can be found [here](https://platform.openai.com/account/api-keys).
 
-- Node v18 or above to be installed on the system.
-- Your own OpenAI API key that can be found [here](https://platform.openai.com/account/api-keys).
-
-```bash
-git clone https://github.com/blenderskool/mocktopus
-cd mocktopus
-npm i
-npm link
-```
+1. Download the binary for your OS from the [releases page](https://github.com/blenderskool/mocktopus/releases/latest)
+2. Rename the binary file to `mocktopus`
+3. Copy the binary to `/usr/bin/` paths (for macOS, Linux). If you cannot copy the the binary to the directory, then update your `PATH` env variable to also include the directory where `mocktopus` binary is stored.
+4. Proceed to adding the OpenAI API key as an environment variable by following the steps in next section
 
 #### Add OpenAI API key as an env variable
 
@@ -42,20 +37,17 @@ Save the file and exit, then restart the terminal.
 ### Usage
 
 ```
-mocktopus [command]
+mocktopus [global options] command [command options] [arguments...]
 
 Commands:
-  proto [options] <source> <destination>  generate mock data for complex structures by analyzing proto definitions
-  placeholder                             generate mock data from natural descriptions
-  tests <source> <destination>            generate test cases for code snippets
-  persona                                 generate user personas for a product
-  help [command]                          display help for command
+  proto        proto <source> <destination>
+  placeholder
+  tests        tests <source> <destination>
+  persona
+  help, h      Shows a list of commands or help for one command
 ```
 
 ### Uninstall
 
-```bash
-npm unlink -g mocktopus
-```
-
-And you can optionally remove the env variables starting with `MOCKTOPUS`
+1. Remove the `mocktopus` binary file
+2. Optionally remove the env variables starting with `MOCKTOPUS`
