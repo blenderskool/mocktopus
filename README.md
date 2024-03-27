@@ -11,14 +11,19 @@
 
 ### Installation
 
-Note: This project requires your own OpenAI API key that can be found [here](https://platform.openai.com/account/api-keys).
+**Note: This project requires your own API key for one of the supported AI models:**
+
+- OpenAI: Can be found [here](https://platform.openai.com/account/api-keys).
+- Google Gemini: Can be found [here](https://aistudio.google.com/).
+
+**Setup CLI**
 
 1. Download the binary for your OS from the [releases page](https://github.com/blenderskool/mocktopus/releases/latest)
 2. Rename the binary file to `mocktopus`
 3. Copy the binary to `/usr/bin/` paths (for macOS, Linux). If you cannot copy the the binary to the directory, then update your `PATH` env variable to also include the directory where `mocktopus` binary is stored.
-4. Proceed to adding the OpenAI API key as an environment variable by following the steps in next section
+4. Proceed to adding the OpenAI/Gemini API key as an environment variable by following the steps in next section
 
-#### Add OpenAI API key as an env variable
+#### Add API key of an AI Model as an env variable
 
 This example is for `zsh` shell, you can add it accordingly for other shell environments.
 
@@ -30,6 +35,7 @@ In the file that is opened, add the following line at the end
 
 ```bash
 export MOCKTOPUS_OPENAI_KEY="<YOUR OPENAI API KEY>"
+export MOCKTOPUS_GEMINI_KEY="<YOUR GEMINI API KEY>"
 ```
 
 Save the file and exit, then restart the terminal.
