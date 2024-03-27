@@ -149,11 +149,11 @@ func ProtoCommand(ctx *cli.Context) error {
 
 	var result string
 	if isCode {
-		result, err = AskGPT(
+		result, err = AskAI(
 			fmt.Sprintf(`Generate JS code with "@faker-js/faker" library to create mock data for the "%s" proto definition. proto definition in object format. Use only UUID for id fields and working image urls if needed\n\n%s`, answers.Definition, defStr),
 		)
 	} else {
-		result, err = AskGPT(
+		result, err = AskAI(
 			fmt.Sprintf(`Generate valid JSON array with %d unique items and each item satisfying the "%s" proto definition. Use only UUID for id fields and working image urls if needed\n\n%s`, answers.Count, answers.Definition, defStr),
 		)
 	}

@@ -35,7 +35,7 @@ func PlaceholderCommand(ctx *cli.Context) error {
 	s.Suffix = " Generating mock placeholder data 🪄\n"
 	s.Start()
 
-	result, err := AskGPT(fmt.Sprintf(`Generate %d placeholder data for %s`, answers.Count, answers.Placeholder))
+	result, err := AskAI(fmt.Sprintf(`Generate %d placeholder data for %s`, answers.Count, answers.Placeholder))
 	s.Stop()
 	if err != nil {
 		return err

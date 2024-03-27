@@ -26,7 +26,7 @@ func PersonaCommand(ctx *cli.Context) error {
 	s.Suffix = " Generating user personas for the product 🪄\n"
 	s.Start()
 
-	result, err := AskGPT(fmt.Sprintf(`Create a few user personas with name alliterations and different backgrounds for %s. Also add behavior, needs and wants, demographics to each persona`, answers.Product))
+	result, err := AskAI(fmt.Sprintf(`Create a few user personas with name alliterations and different backgrounds for %s. Also add behavior, needs and wants, demographics to each persona`, answers.Product))
 	s.Stop()
 	if err != nil {
 		return err

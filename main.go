@@ -11,10 +11,15 @@ import (
 var boldRed = color.New(color.Bold, color.FgHiRed).SprintFunc()
 var boldGreen = color.New(color.Bold, color.FgGreen).SprintFunc()
 var MOCKTOPUS_OPENAI_KEY = os.Getenv("MOCKTOPUS_OPENAI_KEY")
+var MOCKTOPUS_GEMINI_KEY = os.Getenv("MOCKTOPUS_GEMINI_KEY")
 
 func main() {
-	if MOCKTOPUS_OPENAI_KEY == "" {
-		fmt.Println(boldRed(`Please add your OpenAI API key as env variable named "MOCKTOPUS_OPENAI_KEY"`))
+	if MOCKTOPUS_OPENAI_KEY == "" && MOCKTOPUS_GEMINI_KEY == "" {
+		fmt.Println(
+			`Please add API keys for either one of the models as an env variable with its respective name:
+ * OpenAI: "MOCKTOPUS_OPENAI_KEY"
+ * Gemini: "MOCKTOPUS_GEMINI_KEY"`,
+		)
 		return
 	}
 

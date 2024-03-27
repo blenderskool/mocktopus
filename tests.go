@@ -33,7 +33,8 @@ func readFile(path string) (string, error) {
 	}
 
 	str := string(bytes)
-	str = strings.Join(strings.Split(str, "\n")[interval[0]-1:interval[1]], "\n")
+	lines := strings.Split(str, "\n")
+	str = strings.Join(lines[max(interval[0]-1, 0):min(interval[1], len(lines))], "\n")
 
 	return str, nil
 }
@@ -55,7 +56,7 @@ func TestsCommand(ctx *cli.Context) error {
 	s.Suffix = " Generating tests for code snippet 🪄\n"
 	s.Start()
 
-	result, err := AskGPT(fmt.Sprintf(`Generate tests code for the following code snippet based on what it does in the same language\n\n %s`, inputStr))
+	result, err := AskAI(fmt.Sprintf(`Generate tests code for the following code snippet based on what it does in the same language.\n\n %s`, inputStr))
 	s.Stop()
 	if err != nil {
 		return err
